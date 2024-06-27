@@ -1,5 +1,6 @@
 package com.example.hingo;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -42,8 +43,8 @@ public class HabitDao {
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            long id = cursor.getLong(cursor.getColumnIndex(HabitDatabaseHelper.COLUMN_ID));
-            String name = cursor.getString(cursor.getColumnIndex(HabitDatabaseHelper.COLUMN_HABIT_NAME));
+            @SuppressLint("Range") long id = cursor.getLong(cursor.getColumnIndex(HabitDatabaseHelper.COLUMN_ID));
+            @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex(HabitDatabaseHelper.COLUMN_HABIT_NAME));
             habits.add(new Habit(id, name));
             cursor.moveToNext();
         }
@@ -57,8 +58,8 @@ public class HabitDao {
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            long id = cursor.getLong(cursor.getColumnIndex(HabitDatabaseHelper.COLUMN_ID));
-            String name = cursor.getString(cursor.getColumnIndex(HabitDatabaseHelper.COLUMN_HABIT_NAME));
+            @SuppressLint("Range") long id = cursor.getLong(cursor.getColumnIndex(HabitDatabaseHelper.COLUMN_ID));
+            @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex(HabitDatabaseHelper.COLUMN_HABIT_NAME));
             habits.add(new Habit(id, name));
             cursor.moveToNext();
         }
@@ -76,6 +77,12 @@ public class HabitDao {
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            long id = cursor.getLong(cursor.getColumnIndex(HabitDatabaseHelper.COLUMN_ID));
-            String name = cursor.getString(cursor.getColumnIndex(HabitDatabaseHelper.COLUMN_HABIT_NAME));
-            habits.add(new Ha
+            @SuppressLint("Range") long id = cursor.getLong(cursor.getColumnIndex(HabitDatabaseHelper.COLUMN_ID));
+            @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex(HabitDatabaseHelper.COLUMN_HABIT_NAME));
+            habits.add(new Habit(id, name));
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return habits;
+    }
+}
