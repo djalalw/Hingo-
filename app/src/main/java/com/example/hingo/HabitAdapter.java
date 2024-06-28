@@ -32,7 +32,6 @@ public class HabitAdapter extends ArrayAdapter<Habit> {
         return convertView;
     }
 
-    @Override
     public void addAll(List<Habit> collection) {
         habits.clear();
         habits.addAll(collection);
