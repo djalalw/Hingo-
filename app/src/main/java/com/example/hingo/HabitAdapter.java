@@ -1,16 +1,19 @@
 package com.example.hingo;
 
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class HabitAdapter extends ArrayAdapter<Habit> {
 
@@ -34,9 +37,16 @@ public class HabitAdapter extends ArrayAdapter<Habit> {
         nameTextView.setText(habit.getName());
 
         TextView timestampTextView = convertView.findViewById(R.id.timestamp);
-        timestampTextView.setText(String.valueOf(habit.getTimestamp())); // Set timestamp text
+        String formattedTimestamp = formatDate(habit.getTimestamp());
+        timestampTextView.setText(formattedTimestamp); // Set formatted timestamp text
 
         return convertView;
+    }
+
+    private String formatDate(long timestamp) {
+        Date date = new Date(timestamp);
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault());
+        return sdf.format(date);
     }
 
     public void addAll(List<Habit> collection) {
