@@ -15,16 +15,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+// Adapter-Klasse für die Anzeige von Habit-Objekten in einer ListView
 public class HabitAdapter extends ArrayAdapter<Habit> {
 
     private List<Habit> habits;
-    private boolean isAscendingOrder = true; // Initial sort order
+    private boolean isAscendingOrder = true; // Anfängliche Sortierreihenfolge
 
+    // Konstruktor für den HabitAdapter
     public HabitAdapter(Context context, List<Habit> habits) {
         super(context, 0, habits);
         this.habits = habits != null ? habits : new ArrayList<>();
     }
 
+    // Methode zur Erstellung und Rückgabe der View für ein einzelnes Listenelement
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
@@ -38,29 +41,33 @@ public class HabitAdapter extends ArrayAdapter<Habit> {
 
         TextView timestampTextView = convertView.findViewById(R.id.timestamp);
         String formattedTimestamp = formatDate(habit.getTimestamp());
-        timestampTextView.setText(formattedTimestamp); // Set formatted timestamp text
+        timestampTextView.setText(formattedTimestamp); // Formatierte Zeitstempel-Text setzen
 
         return convertView;
     }
 
+    // Hilfsmethode zur Formatierung des Zeitstempels
     private String formatDate(long timestamp) {
         Date date = new Date(timestamp);
-        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.GERMANY);
         return sdf.format(date);
     }
 
+    // Methode zum Hinzufügen einer Sammlung von Habits
     public void addAll(List<Habit> collection) {
         habits.clear();
         habits.addAll(collection);
         super.addAll(collection);
     }
 
+    // Methode zum Löschen aller Habits
     @Override
     public void clear() {
         habits.clear();
         super.clear();
     }
 
+    // Methode zum Sortieren der Habits nach Zeitstempel
     public void sortByTimestamp(boolean ascending) {
         isAscendingOrder = ascending;
         Collections.sort(habits, new Comparator<Habit>() {
@@ -77,5 +84,4 @@ public class HabitAdapter extends ArrayAdapter<Habit> {
         });
         notifyDataSetChanged();
     }
-
 }
