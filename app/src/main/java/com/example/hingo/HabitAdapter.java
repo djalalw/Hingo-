@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -15,19 +16,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-// Adapter-Klasse für die Anzeige von Habit-Objekten in einer ListView
 public class HabitAdapter extends ArrayAdapter<Habit> {
 
     private List<Habit> habits;
-    private boolean isAscendingOrder = true; // Anfängliche Sortierreihenfolge
 
-    // Konstruktor für den HabitAdapter
     public HabitAdapter(Context context, List<Habit> habits) {
         super(context, 0, habits);
-        this.habits = habits != null ? habits : new ArrayList<>();
+        this.habits = new ArrayList<>(habits);
     }
 
-    // Methode zur Erstellung und Rückgabe der View für ein einzelnes Listenelement
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
@@ -41,47 +38,36 @@ public class HabitAdapter extends ArrayAdapter<Habit> {
 
         TextView timestampTextView = convertView.findViewById(R.id.timestamp);
         String formattedTimestamp = formatDate(habit.getTimestamp());
-        timestampTextView.setText(formattedTimestamp); // Formatierte Zeitstempel-Text setzen
+        timestampTextView.setText(formattedTimestamp);
 
         return convertView;
     }
 
-    // Hilfsmethode zur Formatierung des Zeitstempels
     private String formatDate(long timestamp) {
         Date date = new Date(timestamp);
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.GERMANY);
         return sdf.format(date);
     }
 
-    // Methode zum Hinzufügen einer Sammlung von Habits
-    public void addAll(List<Habit> collection) {
-        habits.clear();
-        habits.addAll(collection);
-        super.addAll(collection);
+    public void setHabits(List<Habit> habits) {
+        this.habits.clear();
+        this.habits.addAll(habits);
+        clear();
+        addAll(this.habits);
+        notifyDataSetChanged();
+        Log.d("HabitAdapter", "Habits set, count: " + this.habits.size());
     }
 
-    // Methode zum Löschen aller Habits
-    @Override
-    public void clear() {
-        habits.clear();
-        super.clear();
-    }
-
-    // Methode zum Sortieren der Habits nach Zeitstempel
-    public void sortByTimestamp(boolean ascending) {
-        isAscendingOrder = ascending;
-        Collections.sort(habits, new Comparator<Habit>() {
-            @Override
-            public int compare(Habit habit1, Habit habit2) {
-                long timestamp1 = habit1.getTimestamp();
-                long timestamp2 = habit2.getTimestamp();
-                if (isAscendingOrder) {
-                    return Long.compare(timestamp1, timestamp2);
-                } else {
-                    return Long.compare(timestamp2, timestamp1);
-                }
+    public void sort(boolean ascending) {
+        Collections.sort(habits, (h1, h2) -> {
+            if (ascending) {
+                return Long.compare(h1.getTimestamp(), h2.getTimestamp());
+            } else {
+                return Long.compare(h2.getTimestamp(), h1.getTimestamp());
             }
         });
+        clear();
+        addAll(habits);
         notifyDataSetChanged();
     }
 }

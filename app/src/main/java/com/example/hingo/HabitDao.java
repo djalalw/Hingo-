@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,33 +25,23 @@ public class HabitDao {
         dbHelper.close();
     }
 
-    // Add a new habit to the database
-    public void addHabit(Habit habit) {
+    public long addHabit(Habit habit) {
         ContentValues values = new ContentValues();
         values.put(HabitDatabaseHelper.COLUMN_HABIT_NAME, habit.getName());
-        values.put(HabitDatabaseHelper.COLUMN_TIMESTAMP, habit.getTimestamp()); // Add timestamp value
-        database.insert(HabitDatabaseHelper.TABLE_HABITS, null, values);
+        values.put(HabitDatabaseHelper.COLUMN_TIMESTAMP, habit.getTimestamp());
+        long newRowId = database.insert(HabitDatabaseHelper.TABLE_HABITS, null, values);
+        Log.d("HabitDao", "Habit added with ID: " + newRowId);
+        return newRowId;
     }
 
-    // Delete a habit from the database by its ID
-    public void deleteHabit(long id) {
-        database.delete(HabitDatabaseHelper.TABLE_HABITS,
-                HabitDatabaseHelper.COLUMN_ID + " = ?",
-                new String[]{String.valueOf(id)});
+    public int deleteHabitByName(String name) {
+        int deletedRows = database.delete(HabitDatabaseHelper.TABLE_HABITS,
+                HabitDatabaseHelper.COLUMN_HABIT_NAME + " = ?",
+                new String[]{name});
+        Log.d("HabitDao", "Deleted " + deletedRows + " rows with name: " + name);
+        return deletedRows;
     }
 
-    // Update an existing habit in the database
-    public void updateHabit(Habit habit) {
-        ContentValues values = new ContentValues();
-        values.put(HabitDatabaseHelper.COLUMN_HABIT_NAME, habit.getName());
-        values.put(HabitDatabaseHelper.COLUMN_TIMESTAMP, habit.getTimestamp()); // Update timestamp value
-        database.update(HabitDatabaseHelper.TABLE_HABITS,
-                values,
-                HabitDatabaseHelper.COLUMN_ID + " = ?",
-                new String[]{String.valueOf(habit.getId())});
-    }
-
-    // Search habits by name containing the specified query
     public List<Habit> searchHabits(String query) {
         List<Habit> habits = new ArrayList<>();
         Cursor cursor = database.query(HabitDatabaseHelper.TABLE_HABITS,
@@ -61,10 +52,10 @@ public class HabitDao {
 
         habits = parseCursor(cursor);
         cursor.close();
+        Log.d("HabitDao", "Search found " + habits.size() + " habits");
         return habits;
     }
 
-    // Fetch all habits from the database
     public List<Habit> getAllHabits() {
         List<Habit> habits = new ArrayList<>();
         Cursor cursor = database.query(HabitDatabaseHelper.TABLE_HABITS,
@@ -72,42 +63,13 @@ public class HabitDao {
 
         habits = parseCursor(cursor);
         cursor.close();
+        Log.d("HabitDao", "Retrieved " + habits.size() + " habits");
         return habits;
     }
 
-    // Filter and sort habits by name with optional filter and sort criteria
-    public List<Habit> filterAndSortHabits(String filter, String sort) {
-        List<Habit> habits = new ArrayList<>();
-        String selection = filter != null ? HabitDatabaseHelper.COLUMN_HABIT_NAME + " LIKE ?" : null;
-        String[] selectionArgs = filter != null ? new String[]{"%" + filter + "%"} : null;
-        String orderBy = sort != null ? sort + " ASC" : HabitDatabaseHelper.COLUMN_HABIT_NAME;
-
-        Cursor cursor = database.query(HabitDatabaseHelper.TABLE_HABITS,
-                null, selection, selectionArgs, null, null, orderBy);
-
-        habits = parseCursor(cursor);
-        cursor.close();
-        return habits;
-    }
-
-    // Search habits created between two timestamps
-    public List<Habit> searchHabitsByTime(long fromTimestamp, long toTimestamp) {
-        List<Habit> habits = new ArrayList<>();
-        String selection = HabitDatabaseHelper.COLUMN_TIMESTAMP + " BETWEEN ? AND ?";
-        String[] selectionArgs = {String.valueOf(fromTimestamp), String.valueOf(toTimestamp)};
-
-        Cursor cursor = database.query(HabitDatabaseHelper.TABLE_HABITS,
-                null, selection, selectionArgs, null, null, null);
-
-        habits = parseCursor(cursor);
-        cursor.close();
-        return habits;
-    }
-
-    // Helper method to parse cursor and populate Habit objects
     private List<Habit> parseCursor(Cursor cursor) {
         List<Habit> habits = new ArrayList<>();
-        if (cursor != null && cursor.moveToFirst()) {
+        if (cursor.moveToFirst()) {
             do {
                 long id = cursor.getLong(cursor.getColumnIndexOrThrow(HabitDatabaseHelper.COLUMN_ID));
                 String name = cursor.getString(cursor.getColumnIndexOrThrow(HabitDatabaseHelper.COLUMN_HABIT_NAME));
@@ -117,5 +79,4 @@ public class HabitDao {
         }
         return habits;
     }
-
 }
