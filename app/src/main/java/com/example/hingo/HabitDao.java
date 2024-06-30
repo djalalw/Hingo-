@@ -13,35 +13,41 @@ public class HabitDao {
     private SQLiteDatabase database;
     private HabitDatabaseHelper dbHelper;
 
+    // Konstruktor zur Initialisierung des HabitDatabaseHelper
     public HabitDao(Context context) {
         dbHelper = new HabitDatabaseHelper(context);
     }
 
+    // Methode zum Öffnen der Datenbank für Schreibzugriff
     public void open() {
         database = dbHelper.getWritableDatabase();
     }
 
+    // Methode zum Schließen der Datenbank
     public void close() {
         dbHelper.close();
     }
 
+    // Methode zum Hinzufügen eines neuen Habits zur Datenbank
     public long addHabit(Habit habit) {
         ContentValues values = new ContentValues();
         values.put(HabitDatabaseHelper.COLUMN_HABIT_NAME, habit.getName());
         values.put(HabitDatabaseHelper.COLUMN_TIMESTAMP, habit.getTimestamp());
         long newRowId = database.insert(HabitDatabaseHelper.TABLE_HABITS, null, values);
-        Log.d("HabitDao", "Habit added with ID: " + newRowId);
+        Log.d("HabitDao", "Habit hinzugefügt mit ID: " + newRowId);
         return newRowId;
     }
 
+    // Methode zum Löschen eines Habits anhand des Namens
     public int deleteHabitByName(String name) {
         int deletedRows = database.delete(HabitDatabaseHelper.TABLE_HABITS,
                 HabitDatabaseHelper.COLUMN_HABIT_NAME + " = ?",
                 new String[]{name});
-        Log.d("HabitDao", "Deleted " + deletedRows + " rows with name: " + name);
+        Log.d("HabitDao", "Gelöscht " + deletedRows + " Zeilen mit Namen: " + name);
         return deletedRows;
     }
 
+    // Methode zum Suchen von Habits anhand einer Suchanfrage
     public List<Habit> searchHabits(String query) {
         List<Habit> habits = new ArrayList<>();
         Cursor cursor = database.query(HabitDatabaseHelper.TABLE_HABITS,
@@ -52,10 +58,11 @@ public class HabitDao {
 
         habits = parseCursor(cursor);
         cursor.close();
-        Log.d("HabitDao", "Search found " + habits.size() + " habits");
+        Log.d("HabitDao", "Suche ergab " + habits.size() + " Habits");
         return habits;
     }
 
+    // Methode zum Abrufen aller Habits aus der Datenbank
     public List<Habit> getAllHabits() {
         List<Habit> habits = new ArrayList<>();
         Cursor cursor = database.query(HabitDatabaseHelper.TABLE_HABITS,
@@ -63,10 +70,11 @@ public class HabitDao {
 
         habits = parseCursor(cursor);
         cursor.close();
-        Log.d("HabitDao", "Retrieved " + habits.size() + " habits");
+        Log.d("HabitDao", "Abgerufen " + habits.size() + " Habits");
         return habits;
     }
 
+    // Hilfsmethode zum Parsen eines Cursor-Objekts in eine Liste von Habit-Objekten
     private List<Habit> parseCursor(Cursor cursor) {
         List<Habit> habits = new ArrayList<>();
         if (cursor.moveToFirst()) {
